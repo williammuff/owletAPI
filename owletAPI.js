@@ -130,7 +130,7 @@ class owletAPI {
 				  let res = JSON.parse(body)
 				  if (res.hasOwnProperty('error')) {
 					  removeToken()
-					  getDataPoints().then(function(res){resolve(res)})
+					  getDevices().then(function(res){resolve(res)})
 				  }
 				  else resolve(res)
 				});
@@ -139,6 +139,7 @@ class owletAPI {
 	}
 
 	setProperty(propertyName,propertyValue){
+		let oAPI = this
 		return new Promise(resolve => {
 			let propertyData = this.propertyOptions().find(x => x.name === propertyName)
 			if (propertyData) {
@@ -163,7 +164,12 @@ class owletAPI {
 
 					request(options, function (error, response, body) {
 					  if (error) throw new Error(error);
-					  resolve(body)
+					 
+					  if (body.hasOwnProperty('error')) {
+						  oAPI.removeToken()
+						  oAPI.setProperty(propertyName,propertyValue).then(function(body){resolve(body)})
+					  }
+					  else resolve(body)
 					});
 				})
 			}
